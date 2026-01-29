@@ -1,0 +1,16 @@
+meta {
+  name: AppInfo
+  type: http
+  seq: 3
+}
+
+get {
+  url: 127.0.0.1:5050/app-info
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

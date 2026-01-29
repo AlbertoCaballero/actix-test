@@ -1,0 +1,20 @@
+meta {
+  name: Echo
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:5050/echo
+  body: text
+  auth: inherit
+}
+
+body:text {
+  "This will come back"
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

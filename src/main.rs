@@ -103,8 +103,8 @@ async fn main() -> std::io::Result<()> {
             .route("/hey", web::get().to(manual_hello))
     })
     .workers(4) // Multi-Threading, by default number of CPUs in device
-    // .bind(("127.0.0.1", 5050))?
-    .bind_openssl("127.0.0.1:5050", builder)?
+    .bind(("127.0.0.1", 5050))?
+    // .bind_openssl("127.0.0.1:5050", builder)?
     // .keep_alive(Duration::from_secs(60)) // 60 seconds of keep alive conections
     // .keep_alive(None) // Don't keep alive conections
     .keep_alive(KeepAlive::Os) // Use OS configuration
