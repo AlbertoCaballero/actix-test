@@ -1,5 +1,8 @@
-use actix_web::{App, HttpResponse, HttpServer, Responder, Result, get, guard, http::KeepAlive, post, web};
+use actix_web::{
+    App, HttpResponse, HttpServer, Responder, Result, get, guard, http::KeepAlive, post, web,
+};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+use serde::Deserialize;
 use std::{sync::Mutex, time::Duration};
 use tokio;
 
@@ -12,11 +15,23 @@ struct AppStateCounter {
     counter: Mutex<i32>, //Mutex necessary to mutate safely across threads
 }
 
-#[get("/")]
-async fn index(data: web::Data<AppStateCounter>) -> String {
+#[get("/counter")]
+async fn count(data: web::Data<AppStateCounter>) -> String {
     let mut counter = data.counter.lock().unwrap(); // get counter MutexGuard
     *counter += 1; // access counter inside MutexGuard
     return format!("Request #{counter}");
+}
+
+#[derive(Deserialize)]
+struct User {
+    username: String,
+}
+
+// this handler gets called if the query deserializes into `User` successfully
+// /index?username=Alberto
+#[get("/index")]
+async fn index(user: web::Query<User>) -> String {
+    format!("Welcome {}", user.username)
 }
 
 #[get("/app-info")]
@@ -70,10 +85,18 @@ fn config(cfg: &mut web::ServiceConfig) {
 //     format!("{} {} {}", path.0, path.1, json.id, json.username)
 // }
 
+#[derive(Deserialize)]
+struct Info {
+    user_id: u32,
+    friend: String,
+}
+
 #[get("/users/{user_id}/{friend}")]
-async fn welcome(path: web::Path<(u32, String)>) -> Result<String> {
-    let (user_id, friend) = path.into_inner();
-    Ok(format!("Welcome {}, user_id {}!", friend, user_id))
+async fn welcome(info: web::Path<Info>) -> Result<String> {
+    Ok(format!(
+        "Welcome {}, user_id {}!",
+        info.friend, info.user_id
+    ))
 }
 
 #[actix_web::main]
@@ -102,6 +125,7 @@ async fn main() -> std::io::Result<()> {
                 app_dev: String::from("AlbertoCaballero"),
             }))
             .app_data(counter.clone())
+            .service(count)
             .service(index)
             .service(app_info)
             .service(echo)

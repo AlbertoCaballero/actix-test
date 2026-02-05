@@ -7,3 +7,4 @@ edition = "2024"
 actix-web = { version = "4", features = ["openssl"] }
 tokio = { version = "1", feature = ["full"] }
 openssl = { version = "0.10" }
+serde = { version = "1.0", features = ["derive"] }
