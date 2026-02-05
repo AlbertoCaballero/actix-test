@@ -1,4 +1,4 @@
-use actix_web::{App, HttpResponse, HttpServer, Responder, get, guard, http::KeepAlive, post, web};
+use actix_web::{App, HttpResponse, HttpServer, Responder, Result, get, guard, http::KeepAlive, post, web};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::{sync::Mutex, time::Duration};
 use tokio;
@@ -64,6 +64,18 @@ fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+// #[post("/extract")]
+// async fn extract(path: web::Path<(String, String)>, json: web::Json<MyInfo>) -> impl Responder {
+//     let path = path.into_inner();
+//     format!("{} {} {}", path.0, path.1, json.id, json.username)
+// }
+
+#[get("/users/{user_id}/{friend}")]
+async fn welcome(path: web::Path<(u32, String)>) -> Result<String> {
+    let (user_id, friend) = path.into_inner();
+    Ok(format!("Welcome {}, user_id {}!", friend, user_id))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let counter = web::Data::new(AppStateCounter {
@@ -93,6 +105,8 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(app_info)
             .service(echo)
+            .service(welcome)
+            // .service(extract)
             // .service(scope)
             // .service(
             //     web::scope("/guarded")
