@@ -1,0 +1,20 @@
+meta {
+  name: Guarded
+  type: http
+  seq: 6
+}
+
+get {
+  url: 127.0.0.1:5050/index?username=Alberto
+  body: none
+  auth: inherit
+}
+
+params:query {
+  username: Alberto
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
